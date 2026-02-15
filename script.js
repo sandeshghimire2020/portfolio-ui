@@ -357,8 +357,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
             // Collect form data - keys must match your EmailJS template variables
             const formData = {
-                from_name: name,
-                from_email: email,
+                name: name,
+                email: email,
                 subject: document.getElementById('subject').value.trim() || "No subject",
                 message: message,
             };
