@@ -387,3 +387,138 @@ window.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 });
+
+// ===========================
+// CHAT WIDGET FUNCTIONALITY
+// ===========================
+
+const chatButton = document.getElementById('chatButton');
+const chatWindow = document.getElementById('chatWindow');
+const chatClose = document.getElementById('chatClose');
+const chatForm = document.getElementById('chatForm');
+const chatInput = document.getElementById('chatInput');
+const chatMessages = document.getElementById('chatMessages');
+const chatSend = document.querySelector('.chat-send');
+
+// Configuration
+const API_BASE_URL = window.PORTFOLIO_API_BASE_URL || '/api';
+const SESSION_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+// Toggle chat window
+chatButton.addEventListener('click', () => {
+    chatWindow.classList.toggle('open');
+    if (chatWindow.classList.contains('open')) {
+        chatInput.focus();
+    }
+});
+
+chatClose.addEventListener('click', () => {
+    chatWindow.classList.remove('open');
+});
+
+// Close chat when clicking outside
+document.addEventListener('click', (e) => {
+    const chatWidget = document.getElementById('chatWidget');
+    if (!chatWidget.contains(e.target) && chatWindow.classList.contains('open')) {
+        chatWindow.classList.remove('open');
+    }
+});
+
+// Handle chat form submission
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const message = chatInput.value.trim();
+    if (!message) return;
+    
+    // Add user message to chat
+    addChatMessage(message, 'user');
+    chatInput.value = '';
+    chatSend.disabled = true;
+    
+    // Show loading indicator
+    showLoadingIndicator();
+    
+    try {
+        const url = `${API_BASE_URL}/chat`;
+        console.log('Fetching:', url);
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                session_id: SESSION_ID,
+                message: message
+            })
+        });
+        
+        console.log('Response status:', response.status, response.ok);
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('API response:', data);
+        removeLoadingIndicator();
+        addChatMessage(data.response, 'bot');
+        
+    } catch (error) {
+        console.error('Chat error:', error);
+        removeLoadingIndicator();
+        addChatMessage(
+            "Sorry, I couldn't reach the AI right now. Try again later!",
+            'bot'
+        );
+    }
+    
+    chatSend.disabled = false;
+});
+
+// Allow Enter to send (Shift+Enter for new line)
+chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        chatForm.dispatchEvent(new Event('submit'));
+    }
+});
+
+function addChatMessage(text, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.textContent = text;
+    
+    messageDiv.appendChild(contentDiv);
+    chatMessages.appendChild(messageDiv);
+    
+    // Auto-scroll to bottom
+    setTimeout(() => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 0);
+}
+
+function showLoadingIndicator() {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'chat-message bot-message';
+    messageDiv.id = 'loading-message';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content message-loading';
+    contentDiv.innerHTML = '<span></span><span></span><span></span>';
+    
+    messageDiv.appendChild(contentDiv);
+    chatMessages.appendChild(messageDiv);
+    
+    // Auto-scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function removeLoadingIndicator() {
+    const loadingMessage = document.getElementById('loading-message');
+    if (loadingMessage) {
+        loadingMessage.remove();
+    }
+}
