@@ -366,7 +366,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
             // Send email using EmailJS
             emailjs.send("service_v9f3hht", "template_bs2aaty", formData)
                 .then((response) => {
-                    console.log('Email sent successfully:', response);
                     alert("Message sent successfully! I'll get back to you soon.");
                     contactForm.reset();
                 })
@@ -401,8 +400,10 @@ const chatMessages = document.getElementById('chatMessages');
 const chatSend = document.querySelector('.chat-send');
 
 // Configuration
-const API_BASE_URL = window.PORTFOLIO_API_BASE_URL || '/api';
-const SESSION_ID = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+const API_CHAT_URL = (window.PORTFOLIO_CHAT_API_URL || '').trim();
+const SESSION_ID = (window.crypto && window.crypto.randomUUID)
+    ? window.crypto.randomUUID()
+    : 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
 // Toggle chat window
 chatButton.addEventListener('click', () => {
@@ -440,9 +441,16 @@ chatForm.addEventListener('submit', async (e) => {
     showLoadingIndicator();
     
     try {
-        const url = `${API_BASE_URL}/chat`;
-        console.log('Fetching:', url);
-        const response = await fetch(url, {
+        if (!API_CHAT_URL) {
+            throw new Error('Chat API is not configured. Set window.PORTFOLIO_CHAT_API_URL to an HTTPS endpoint.');
+        }
+
+        const isMixedContentBlocked = window.location.protocol === 'https:' && API_CHAT_URL.startsWith('http://');
+        if (isMixedContentBlocked) {
+            throw new Error('Mixed content blocked. Use an HTTPS API URL when the site is served over HTTPS.');
+        }
+
+        const response = await fetch(API_CHAT_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -452,22 +460,32 @@ chatForm.addEventListener('submit', async (e) => {
                 message: message
             })
         });
-        
-        console.log('Response status:', response.status, response.ok);
+
         if (!response.ok) {
             throw new Error(`API error: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('API response:', data);
         removeLoadingIndicator();
-        addChatMessage(data.response, 'bot');
+
+        const botReply = data.response || data.reply || data.answer || data.message || data.text;
+        addChatMessage(
+            typeof botReply === 'string' && botReply.trim()
+                ? botReply
+                : "I received your message, but I couldn't parse the response.",
+            'bot'
+        );
         
     } catch (error) {
         console.error('Chat error:', error);
         removeLoadingIndicator();
+        const userFriendlyError = error.message && error.message.includes('Chat API is not configured')
+            ? 'Chat is temporarily unavailable because the API URL is not configured in this deployment.'
+            : error.message && error.message.includes('Mixed content blocked')
+            ? 'Your portfolio is on HTTPS but this chat API URL is HTTP. Enable HTTPS on the API endpoint, then set window.PORTFOLIO_CHAT_API_URL to that HTTPS URL.'
+            : "Sorry, I couldn't reach the AI right now. Try again later!";
         addChatMessage(
-            "Sorry, I couldn't reach the AI right now. Try again later!",
+            userFriendlyError,
             'bot'
         );
     }
