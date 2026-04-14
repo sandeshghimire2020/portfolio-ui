@@ -873,9 +873,9 @@
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             // Development: Allow HTTP for local testing
             window.PORTFOLIO_CHAT_API_URL = 'http://18.117.144.120:8000/api/chat';
-        } else if (window.location.hostname === 'sandeshghimire.net' || window.location.hostname === 'www.sandeshghimire.net') {
-            // Production: Use HTTPS for security and mixed-content compliance
-            window.PORTFOLIO_CHAT_API_URL = 'https://18.117.144.120:8000/api/chat';
+        } else {
+            // Production: Use HTTPS subdomain endpoint
+            window.PORTFOLIO_CHAT_API_URL = 'https://api.sandeshghimire.net/api/chat';
         }
     </script>
     <script src="script.js"></script>

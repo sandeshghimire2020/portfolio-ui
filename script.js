@@ -370,7 +370,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     contactForm.reset();
                 })
                 .catch((error) => {
-                    console.error("EmailJS Error:", error);
                     alert("Failed to send message. Please try again later.");
                 })
                 .finally(() => {
@@ -477,7 +476,6 @@ chatForm.addEventListener('submit', async (e) => {
         );
         
     } catch (error) {
-        console.error('Chat error:', error);
         removeLoadingIndicator();
         const userFriendlyError = error.message && error.message.includes('Chat API is not configured')
             ? 'Chat is temporarily unavailable because the API URL is not configured in this deployment.'
