@@ -387,3 +387,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
 });
 
 
+
+// Cursor-follow glow on experience bento cards
+document.querySelectorAll('.bento-panel').forEach((panel) => {
+    panel.addEventListener('pointermove', (e) => {
+        const rect = panel.getBoundingClientRect();
+        panel.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+        panel.style.setProperty('--my', `${e.clientY - rect.top}px`);
+    });
+});

@@ -2152,12 +2152,210 @@ a.contact-value:hover {
     color: #F4A460 !important;
 }
 
+/* ===========================
+   EXPERIENCE BENTO CARDS
+   =========================== */
 
-        max-width: 100%;
-        max-height: calc(100vh - 100px);
+.bento {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.bento-panel {
+    position: relative;
+    grid-column: span 3;
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+    min-height: 220px;
+    padding: clamp(1.4rem, 2.5vw, 2rem);
+    background: #fff;
+    border: 1px solid #fde68a;
+    border-radius: 24px;
+    box-shadow: 0 20px 44px -28px rgba(146, 64, 14, 0.4);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bento-panel:hover {
+    transform: translateY(-4px);
+}
+
+.bento-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(217, 119, 6, 0.12), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.bento-panel:hover::after {
+    opacity: 1;
+}
+
+/* Row 1 is two-thirds / one-third, row 2 is half / half */
+.bento-panel:nth-child(1) {
+    grid-column: span 4;
+}
+
+.bento-panel:nth-child(2) {
+    grid-column: span 2;
+}
+
+.bento-panel:nth-child(1),
+.bento-panel:nth-child(4) {
+    background: linear-gradient(160deg, #fff, #fffbeb);
+}
+
+.bento-panel header {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.bento-n {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #b45309;
+    border: 1px solid #b45309;
+    border-radius: 50%;
+    transition: background 0.3s, color 0.3s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bento-panel:hover .bento-n {
+    background: linear-gradient(135deg, #d97706, #a16207);
+    color: #fff;
+    transform: rotate(360deg);
+}
+
+.bento-panel h3 {
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1f2937;
+}
+
+.bento-company {
+    margin-top: 0.15rem;
+    font-weight: 600;
+    color: #b45309;
+}
+
+.bento-company span {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #6b7280;
+}
+
+.bento-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-self: start;
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #15803d;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+}
+
+.bento-text {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #4b5563;
+}
+
+.bento-text b {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.bento-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.bento-chips li {
+    padding: 0.45rem 0.95rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #92400e;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 999px;
+    transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bento-chips li:hover {
+    background: #b45309;
+    color: #fff;
+    border-color: #b45309;
+    transform: translateY(-3px) rotate(-1.5deg);
+}
+
+.bento-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem 1.5rem;
+}
+
+.bento-list li {
+    padding-left: 0.9rem;
+    border-left: 2px solid #fde68a;
+    transition: border-color 0.25s;
+}
+
+.bento-list li:hover {
+    border-left-color: #d97706;
+}
+
+.bento-list h4 {
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.bento-list p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .bento-list {
+        grid-template-columns: 1fr;
     }
 
-    .message-content {
-        max-width: 90%;
+    .bento-panel,
+    .bento-panel:nth-child(1),
+    .bento-panel:nth-child(2) {
+        grid-column: 1 / -1;
+        min-height: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bento-panel,
+    .bento-n,
+    .bento-chips li {
+        transition: none;
+    }
+
+    .bento-panel:hover,
+    .bento-panel:hover .bento-n,
+    .bento-chips li:hover {
+        transform: none;
     }
 }
